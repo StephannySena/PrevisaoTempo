@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Previsão do Tempo</title>
+</head>
+
+<body>
+    <header>
+        <div>
+            <h2>Previsão do Tempo</h2>
+
+        </div>
+    </header>
+
+    <main>
+        <div>
+            <input type="text" id="idCidade" placeholder="Cidade">
+            <input type="date" id="idData">
+            <input type="button" id="btnPesquisar" value="Pesquisar">
+        </div>
+
+        <div>
+            <p id="idLocal"></p>
+            <div>
+                <img src="" alt="" id="idImgDia1">
+                <figcaption id="idCondicao"></figcaption>
+                <p id="idTemperaturas"></p>
+                <p id="idPossibChuva"></p>
+                <p id="idPossibNeve"></p>
+            </div>
+
+            <div>
+                <img src="#" alt="" id="idImgDia2">
+                <output id="idOutDia2"></output>
+            </div>
+
+            <div>
+                <img src="#" alt="" id="idImgDia3">
+                <output id="idOutDia3"></output>
+            </div>
+
+        </div>
+
+    </main>
+
+    <footer></footer>
+
+    <script>
+
+        var cidade 
+        var data
+        var tempMax
+        var condicaoTempo
+        var imgTempo
+        var vaiChover
+        var vaiNevar
+        
+
+        var btnPesquisar = document.getElementById("btnPesquisar")
+        btnPesquisar.onclick = function () {
+            cidade = document.getElementById("idCidade").value
+            data = document.getElementById("idData").value
+
+            pegarPrevisao()
+        }
+
+
+
+        function pegarPrevisao() {
+            fetch("https://weatherapi-com.p.rapidapi.com/forecast.json?q=" + cidade + "&dt=" + data + "&days=3" + "&lang=pt", {
+                "method": "GET",
+                "headers": {
+                    "x-rapidapi-host": "weatherapi-com.p.rapidapi.com",
+                    "x-rapidapi-key": "b329e6dadamshacd6405a7a4465fp1e0c6bjsn48d9b278ba9d"
+                }
+            })
+                .then(response => {
+                    return response.json();
+                })
+                .then(previsao => {
+                    console.log(previsao);
+
+                    tempMin = previsao.forecast.forecastday[0].day.mintemp_c
+                    tempMax = previsao.forecast.forecastday[0].day.maxtemp_c
+                    condicaoTempo = previsao.forecast.forecastday[0].day.condition.text
+                    imgTempo = previsao.forecast.forecastday[0].day.condition.icon
+                    vaiChover = previsao.forecast.forecastday[0].day.daily_will_it_rain
+                    vaiNevar = previsao.forecast.forecastday[0].day.daily_will_it_snow
+
+
+                    return tempMin, tempMax, condicaoTempo, imgTempo, vaiChover, vaiNevar
+                })
+                .then(() => {
+                    mostrarPrevisao()
+                })
+                .catch(err => {
+                    console.error(err);
+                });
+
+        }
+
+        function mostrarPrevisao() {
+            document.getElementById("idLocal").innerHTML = cidade
+            document.getElementById("idImgDia1").src = "https:" + imgTempo
+            document.getElementById("idCondicao").innerHTML = condicaoTempo
+            
+            document.getElementById("idTemperaturas").innerHTML = "Mín.: " + tempMin + "ºC" + " -  Máx.: " + tempMax + "ºC"
+
+
+            let chuva
+            if (vaiChover == 1) {
+                chuva = "Possibilidade de chuva para esse dia"
+
+            } else {
+                chuva = "Não há possibilidade de chuva para esse dia"
+            }
+            document.getElementById("idPossibChuva").innerHTML = chuva
+
+            let neve
+            if (vaiNevar == 1) {
+                neve = "Possibilidade de neve para esse dia"
+
+            } else {
+                neve = "Não há possibilidade de neve para esse dia"
+            }
+            document.getElementById("idPossibNeve").innerHTML = neve
+
+
+
+
+
+        }
+
+
+
+
+    </script>
+</body>
+
+</html>
