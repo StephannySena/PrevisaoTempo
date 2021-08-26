@@ -13,27 +13,29 @@
 
 <body class="bg-info p-2 text-dark bg-opacity-10">
     <header>
-        <div class="text-center m-3 p-3">
+        <div class="text-center m-5 p-3">
             <h2 class="text-center">Previsão do Tempo</h2>
 
         </div>
     </header>
 
     <main>
-        <div class="row justify-content-center">
+        <div class="row justify-content-center m-5">
             <input type="text" id="idCidade" placeholder="Cidade" class="col-sm-3 border rounded border-dark m-2 p-2">
             <input type="text" id="idDias" placeholder="Qnt. dias de previsão"
-                class="col-sm-2 border rounded border-dark m-2 p-2">
+                class="col-sm-2 border rounded border-dark m-2 p-2 text-center">
             <input type="button" id="btnPesquisar" value="Pesquisar"
                 class="col-sm-1 btn btn-info btn-sm border rounded border-dark">
         </div>
 
 
         <div class="row justify-content-center">
-            
-            
-            <p id="idLocal" class="border rounded border-dark m-2 p-2 bg-light row justify-content-md-center"></p>
-                
+
+            <div class="container-lg">
+                <p id="idLocal" class="border rounded border-dark m-2 p-2 bg-light text-center"></p>
+
+            </div>
+
             <div id="idDia0" class="col-md-3 border rounded border-dark m-2 p-2 bg-light">
                 <img src="" alt="" id="idImgDia0">
 
@@ -64,6 +66,15 @@
         var tempMax = []
         var condicaoTempo = []
         var imgTempo = []
+        var data = []
+        
+
+        var inpCidade = document.getElementById("idCidade")
+        inpCidade.oninput = function () {
+            cidade = inpCidade.value
+            sugestaoCidade()
+        }
+
 
 
 
@@ -76,7 +87,7 @@
 
 
         function pegarPrevisao(dias) {
-            cidade = document.getElementById("idCidade").value
+            //cidade = document.getElementById("idCidade").value
             fetch("https://weatherapi-com.p.rapidapi.com/forecast.json?q=" + cidade + "&days=3&lang=pt&dt=", {
                 "method": "GET",
                 "headers": {
@@ -95,6 +106,7 @@
                         tempMax.push(previsao.forecast.forecastday[i].day.maxtemp_c)
                         condicaoTempo.push(previsao.forecast.forecastday[i].day.condition.text)
                         imgTempo.push(previsao.forecast.forecastday[i].day.condition.icon)
+                        data.push(previsao.forecast.forecastday[i].date)
 
                     }
                     console.log(tempMin);
@@ -103,7 +115,7 @@
                 })
                 .then(() => {
                     for (let i = 0; i < dias; i++)
-                        mostrarPrevisao(i)
+                        montaDia(i)
 
                 })
                 .catch(err => {
@@ -112,23 +124,46 @@
 
         }
 
-        function mostrarPrevisao(index) {
+        function montaDia(index) {
 
             document.getElementById("idLocal").innerHTML = cidade
 
             let dia = document.getElementById("idDia" + index)
-            dia.appendChild(montaDia(condicaoTempo[index]))
-            dia.appendChild(montaDia("Mín.: " + tempMin[index] + "ºC" + " -  Máx.: " + tempMax[index] + "ºC"))
+            dia.appendChild(montaP(condicaoTempo[index]))
+            dia.appendChild(montaP("Mín.: " + tempMin[index] + "ºC" + " -  Máx.: " + tempMax[index] + "ºC"))
             document.getElementById("idImgDia" + index).src = "https:" + imgTempo[index]
+            dia.appendChild(montaP(data[index]))
 
 
         }
 
-        function montaDia(dado) {
+        function montaP(dado) {
             let prevDia = document.createElement("p")
             prevDia.textContent = dado
             return prevDia
 
+        }
+
+
+        function sugestaoCidade(params) {
+            fetch("https://weatherapi-com.p.rapidapi.com/search.json?q="+ cidade, {
+                "method": "GET",
+                "headers": {
+                    "x-rapidapi-host": "weatherapi-com.p.rapidapi.com",
+                    "x-rapidapi-key": "b329e6dadamshacd6405a7a4465fp1e0c6bjsn48d9b278ba9d"
+                }
+            })
+                .then(response => {
+                    return response.json();
+                })
+                .then(dado => {
+                    console.log(dado);
+                    cidade = dado[0].name
+
+                })
+                .catch(err => {
+                    console.error(err);
+                });
         }
 
     </script>
