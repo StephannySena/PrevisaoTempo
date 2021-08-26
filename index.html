@@ -6,42 +6,44 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Previsão do Tempo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+
 </head>
 
-<body>
+<body class="bg-info p-2 text-dark bg-opacity-10">
     <header>
-        <div>
-            <h2>Previsão do Tempo</h2>
+        <div class="text-center">
+            <h2 class="text-center">Previsão do Tempo</h2>
 
         </div>
     </header>
 
     <main>
-        <div>
-            <input type="text" id="idCidade" placeholder="Cidade">
-            <input type="date" id="idData">
-            <input type="button" id="btnPesquisar" value="Pesquisar">
+        <div class="row justify-content-center">
+            <input type="text" id="idCidade" placeholder="Cidade" class="col-sm-3 border rounded border-dark m-2 p-2">
+            <input type="text" id="idDias" placeholder="Qnt. dias de previsão" class="col-sm-2 border rounded border-dark m-2 p-2">
+            <input type="button" id="btnPesquisar" value="Pesquisar" class="col-sm-1 btn btn-info btn-sm border rounded border-dark">
         </div>
+        
 
-        <div>
+        <div class="row justify-content-center">
             <p id="idLocal"></p>
-            <div>
+            <div id="idDia0" class="col-md-3 border rounded border-dark m-2 p-2 bg-light">
+                <img src="" alt="" id="idImgDia0">
+
+            </div>
+
+            <div id="idDia1" class="col-md-3 border rounded border-dark m-2 p-2 bg-light">
                 <img src="" alt="" id="idImgDia1">
-                <figcaption id="idCondicao"></figcaption>
-                <p id="idTemperaturas"></p>
-                <p id="idPossibChuva"></p>
-                <p id="idPossibNeve"></p>
+
             </div>
 
-            <div>
-                <img src="#" alt="" id="idImgDia2">
-                <output id="idOutDia2"></output>
+            <div id="idDia2"class="col-md-3 border rounded border-dark m-2 p-2 bg-light">
+                <img src="" alt="" id="idImgDia2">
+
             </div>
 
-            <div>
-                <img src="#" alt="" id="idImgDia3">
-                <output id="idOutDia3"></output>
-            </div>
 
         </div>
 
@@ -51,27 +53,26 @@
 
     <script>
 
-        var cidade 
-        var data
-        var tempMax
-        var condicaoTempo
-        var imgTempo
-        var vaiChover
-        var vaiNevar
-        
+        var cidade
+        var dias
+        var tempMin = []
+        var tempMax = []
+        var condicaoTempo = []
+        var imgTempo = []
+
 
         var btnPesquisar = document.getElementById("btnPesquisar")
         btnPesquisar.onclick = function () {
             cidade = document.getElementById("idCidade").value
-            data = document.getElementById("idData").value
+            dias = Number(document.getElementById("idDias").value)
 
-            pegarPrevisao()
+            pegarPrevisao(dias)
         }
 
 
 
-        function pegarPrevisao() {
-            fetch("https://weatherapi-com.p.rapidapi.com/forecast.json?q=" + cidade + "&dt=" + data + "&days=3" + "&lang=pt", {
+        function pegarPrevisao(dias) {
+            fetch("https://weatherapi-com.p.rapidapi.com/forecast.json?q=" + cidade + "&days=3&lang=pt&dt=", {
                 "method": "GET",
                 "headers": {
                     "x-rapidapi-host": "weatherapi-com.p.rapidapi.com",
@@ -84,18 +85,21 @@
                 .then(previsao => {
                     console.log(previsao);
 
-                    tempMin = previsao.forecast.forecastday[0].day.mintemp_c
-                    tempMax = previsao.forecast.forecastday[0].day.maxtemp_c
-                    condicaoTempo = previsao.forecast.forecastday[0].day.condition.text
-                    imgTempo = previsao.forecast.forecastday[0].day.condition.icon
-                    vaiChover = previsao.forecast.forecastday[0].day.daily_will_it_rain
-                    vaiNevar = previsao.forecast.forecastday[0].day.daily_will_it_snow
+                    for (let i = 0; i < dias; i++) {
+                        tempMin.push(previsao.forecast.forecastday[i].day.mintemp_c)
+                        tempMax.push(previsao.forecast.forecastday[i].day.maxtemp_c)
+                        condicaoTempo.push(previsao.forecast.forecastday[i].day.condition.text)
+                        imgTempo.push(previsao.forecast.forecastday[i].day.condition.icon)
 
+                    }
+                    console.log(tempMin);
 
-                    return tempMin, tempMax, condicaoTempo, imgTempo, vaiChover, vaiNevar
+                    return tempMin, tempMax, condicaoTempo, imgTempo
                 })
                 .then(() => {
-                    mostrarPrevisao()
+                    for (let i = 0; i < dias; i++)
+                        mostrarPrevisao(i)
+
                 })
                 .catch(err => {
                     console.error(err);
@@ -103,42 +107,31 @@
 
         }
 
-        function mostrarPrevisao() {
+        function mostrarPrevisao(index) {
+
             document.getElementById("idLocal").innerHTML = cidade
-            document.getElementById("idImgDia1").src = "https:" + imgTempo
-            document.getElementById("idCondicao").innerHTML = condicaoTempo
-            
-            document.getElementById("idTemperaturas").innerHTML = "Mín.: " + tempMin + "ºC" + " -  Máx.: " + tempMax + "ºC"
 
-
-            let chuva
-            if (vaiChover == 1) {
-                chuva = "Possibilidade de chuva para esse dia"
-
-            } else {
-                chuva = "Não há possibilidade de chuva para esse dia"
-            }
-            document.getElementById("idPossibChuva").innerHTML = chuva
-
-            let neve
-            if (vaiNevar == 1) {
-                neve = "Possibilidade de neve para esse dia"
-
-            } else {
-                neve = "Não há possibilidade de neve para esse dia"
-            }
-            document.getElementById("idPossibNeve").innerHTML = neve
-
-
-
+            let dia = document.getElementById("idDia" + index)
+            dia.appendChild(montaDia(condicaoTempo[index]))
+            dia.appendChild(montaDia("Mín.: " + tempMin[index] + "ºC" + " -  Máx.: " + tempMax[index] + "ºC"))
+            document.getElementById("idImgDia" + index).src = "https:" + imgTempo[index]
 
 
         }
 
+        function montaDia(dado) {
+            let prevDia = document.createElement("p")
+            prevDia.textContent = dado
+            return prevDia
 
-
+        }
 
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj"
+        crossorigin="anonymous"></script>
+
 </body>
 
 </html>
