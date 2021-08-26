@@ -13,7 +13,7 @@
 
 <body class="bg-info p-2 text-dark bg-opacity-10">
     <header>
-        <div class="text-center">
+        <div class="text-center m-3 p-3">
             <h2 class="text-center">Previsão do Tempo</h2>
 
         </div>
@@ -22,13 +22,18 @@
     <main>
         <div class="row justify-content-center">
             <input type="text" id="idCidade" placeholder="Cidade" class="col-sm-3 border rounded border-dark m-2 p-2">
-            <input type="text" id="idDias" placeholder="Qnt. dias de previsão" class="col-sm-2 border rounded border-dark m-2 p-2">
-            <input type="button" id="btnPesquisar" value="Pesquisar" class="col-sm-1 btn btn-info btn-sm border rounded border-dark">
+            <input type="text" id="idDias" placeholder="Qnt. dias de previsão"
+                class="col-sm-2 border rounded border-dark m-2 p-2">
+            <input type="button" id="btnPesquisar" value="Pesquisar"
+                class="col-sm-1 btn btn-info btn-sm border rounded border-dark">
         </div>
-        
+
 
         <div class="row justify-content-center">
-            <p id="idLocal"></p>
+            
+            
+            <p id="idLocal" class="border rounded border-dark m-2 p-2 bg-light row justify-content-md-center"></p>
+                
             <div id="idDia0" class="col-md-3 border rounded border-dark m-2 p-2 bg-light">
                 <img src="" alt="" id="idImgDia0">
 
@@ -39,7 +44,7 @@
 
             </div>
 
-            <div id="idDia2"class="col-md-3 border rounded border-dark m-2 p-2 bg-light">
+            <div id="idDia2" class="col-md-3 border rounded border-dark m-2 p-2 bg-light">
                 <img src="" alt="" id="idImgDia2">
 
             </div>
@@ -61,17 +66,17 @@
         var imgTempo = []
 
 
+
         var btnPesquisar = document.getElementById("btnPesquisar")
         btnPesquisar.onclick = function () {
-            cidade = document.getElementById("idCidade").value
             dias = Number(document.getElementById("idDias").value)
-
             pegarPrevisao(dias)
         }
 
 
 
         function pegarPrevisao(dias) {
+            cidade = document.getElementById("idCidade").value
             fetch("https://weatherapi-com.p.rapidapi.com/forecast.json?q=" + cidade + "&days=3&lang=pt&dt=", {
                 "method": "GET",
                 "headers": {
