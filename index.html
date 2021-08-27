@@ -21,36 +21,24 @@
 
     <main>
         <div class="row justify-content-center m-5">
-            <input type="text" id="idCidade" placeholder="Cidade" class="col-sm-3 border rounded border-dark m-2 p-2">
+            <input type="text" id="idCidade" placeholder="Cidade" class="col-sm-3 border rounded border-dark m-2 p-1">
             <input type="text" id="idDias" placeholder="Qnt. dias de previsão"
-                class="col-sm-2 border rounded border-dark m-2 p-2 text-center">
+                class="col-sm-2 border rounded border-dark m-2 p-1 text-center">
             <input type="button" id="btnPesquisar" value="Pesquisar"
-                class="col-sm-1 btn btn-info btn-sm border rounded border-dark">
+                class="col-sm-1 btn btn-info btn m-3 p-2 border rounded border-dark">
         </div>
 
 
-        <div class="row justify-content-center">
+        <div id="idPrevisoes" class="row justify-content-center">
 
             <div class="container-lg">
-                <p id="idLocal" class="border rounded border-dark m-2 p-2 bg-light text-center"></p>
-
+                <p id="idLocal" class="border rounded border-dark m-2 p-2 bg-light text-center">Consulte a previsão do tempo da sua cidade</p>
             </div>
 
-            <div id="idDia0" class="col-md-3 border rounded border-dark m-2 p-2 bg-light">
-                <img src="" alt="" id="idImgDia0">
 
-            </div>
 
-            <div id="idDia1" class="col-md-3 border rounded border-dark m-2 p-2 bg-light">
-                <img src="" alt="" id="idImgDia1">
 
-            </div>
-
-            <div id="idDia2" class="col-md-3 border rounded border-dark m-2 p-2 bg-light">
-                <img src="" alt="" id="idImgDia2">
-
-            </div>
-
+            
 
         </div>
 
@@ -82,6 +70,7 @@
         btnPesquisar.onclick = function () {
             dias = Number(document.getElementById("idDias").value)
             pegarPrevisao(dias)
+            
         }
 
 
@@ -100,8 +89,9 @@
                 })
                 .then(previsao => {
                     console.log(previsao);
+                    
 
-                    for (let i = 0; i < dias; i++) {
+                    for (let i = 0; i < previsao.forecast.forecastday.length; i++) {
                         tempMin.push(previsao.forecast.forecastday[i].day.mintemp_c)
                         tempMax.push(previsao.forecast.forecastday[i].day.maxtemp_c)
                         condicaoTempo.push(previsao.forecast.forecastday[i].day.condition.text)
@@ -128,10 +118,15 @@
 
             document.getElementById("idLocal").innerHTML = cidade
 
-            let dia = document.getElementById("idDia" + index)
+            let quadroPrevisoes = document.getElementById("idPrevisoes")
+            
+            let dia = quadroPrevisoes.appendChild(montaDiv())
+
+
+            
+            dia.appendChild(montaImg("https:" + imgTempo[index]))
             dia.appendChild(montaP(condicaoTempo[index]))
             dia.appendChild(montaP("Mín.: " + tempMin[index] + "ºC" + " -  Máx.: " + tempMax[index] + "ºC"))
-            document.getElementById("idImgDia" + index).src = "https:" + imgTempo[index]
             dia.appendChild(montaP(data[index]))
 
 
@@ -142,6 +137,28 @@
             prevDia.textContent = dado
             return prevDia
 
+        }
+
+        function montaImg(dado) {
+            let prevImg = document.createElement("img")
+            prevImg.src = dado
+            return prevImg
+        }
+
+        function montaDiv() {
+            let prevDiv = document.createElement("div")
+            prevDiv.classList.add("col-md-3")
+            prevDiv.classList.add("border")
+            prevDiv.classList.add("rounded")
+            prevDiv.classList.add("border-dark")
+            prevDiv.classList.add("m-2")
+            prevDiv.classList.add("p-2")
+            prevDiv.classList.add("bg-light")
+            prevDiv.classList.add("text-center")
+
+            
+            return prevDiv
+            
         }
 
 
